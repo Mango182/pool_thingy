@@ -272,6 +272,13 @@ function cue(angle){
 function potted(ball, pocket){
   if (isTouching(ball, pocket)){
     hideElement(ball.name);
+    if (ball.type == 'solid'){
+      removeItem(solids, )//how can it determain what index it is
+    }else if (ball.type == 'stripe'){
+      removeItem(stripes, )
+    }else(
+      setScreen('results')//automatically to the results screen b/c 8ball was potted()find a way to make this the last ball in a list
+    )
     console.log(ball.name + ' has been potted');
   }
 }

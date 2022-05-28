@@ -38,17 +38,39 @@ onEvent("goBackButton","click", function(){
   setScreen("home");
 });
 
-//when the mouse is moved rotate around the cueBsll
-onEvent("gameScreen","mousemove",function(event){
-  var x = mouse_position(event)[0];
-  var y = mouse_position(event)[1];
-  theta = angle(x,y);
-  cue_position(x, y, theta);
+// // when the mouse is moved rotate around the cueBall
+// onEvent("gameScreen","mousemove",function(event){
+//   var x = mouse_position(event)[0];
+//   var y = mouse_position(event)[1];
+//   theta = angle(x,y);
+//   cue_position(x, y, theta);
+// });
+
+
+//this is a test
+//so far it looks like this test is successful to making the cuestick stay
+var pressing = false;
+
+onEvent('gameScreen', 'mousedown', function(){
+  pressing = true;
+})
+
+onEvent('gameScreen', 'mousemove', function(){
+  if (pressing){
+    var x = mouse_position(event)[0];
+    var y = mouse_position(event)[1];
+    theta = angle(x,y);
+    cue_position(x, y, theta);
+  }
+});
+
+onEvent('gameScreen', 'mouseup', function(){
+  pressing = false;
 });
 
 //when the ball is fired, resolve collisions. once collisions are resolved, end loop, switch turns, and stop loop.
 var shot = false;
-var theta;
+var theta = 0;
 
 onEvent("test", 'click', function(event){
   var x = mouse_position(event)[0];

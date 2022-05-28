@@ -10,6 +10,9 @@ var pocketList = createPockets();
 var solids = [];
 var stripes = [];
 var turn = 'one';
+//maybe change turn to a dictionary to assign it stripes and solids
+//var player = {turn: 'one', type: none};
+//depending on the type of the first potted one , that is what you are
 var velocity;
 
 //takes you to the game screen and sets the position of each ball
@@ -68,12 +71,12 @@ onEvent("test", 'click', function(event){
         velocity += (b.x_v + b.y_v);
       }
     }
-      if (Math.abs(velocity) <= 0.01 && shot){
-        stopTimedLoop();
-        setTimeout(function(){}, 200)
-        switchTurn();
-        shot = false;
-      }
+    if (Math.abs(velocity) <= 0.01 && shot){
+      stopTimedLoop();
+      setTimeout(function(){}, 200)
+      switchTurn();
+      shot = false;
+    }
   });
 });
 
@@ -150,25 +153,25 @@ function drag(ball){
   if (ball.x_v > 0){
     ball.x += ball.x_v;
     ball.x_v *= (0.95);
-    if (ball.x_v < 0.05){
+    if (ball.x_v < 0.07){
       ball.x_v = 0;
     }
   }else if (ball.x_v < 0){
     ball.x += ball.x_v;
     ball.x_v *= (0.95);
-    if (ball.x_v > -0.05){
+    if (ball.x_v > -0.07){
       ball.x_v = 0;
     }
   }if (ball.y_v > 0){
     ball.y += ball.y_v;
     ball.y_v *= (0.95);
-    if (ball.y_v < 0.05){
+    if (ball.y_v < 0.07){
       ball.y_v = 0;
     }
   }else if (ball.y_v < 0){
     ball.y += ball.y_v;
     ball.y_v *= (0.95);
-    if (ball.y_v > -0.05){
+    if (ball.y_v > -0.07){
       ball.y_v = 0;
     }
   }
@@ -317,3 +320,13 @@ ur mom - Miguel
 make ms.mares watch anime pls - juli >:3
 yowaimo <3 - juli
 */
+
+
+
+// for (var pocket in pocketList){
+//   for (var ball in ballList){
+//     pocket = pocketList[pocket];
+//     basll = ballList[ball];
+//     potted(ball, pocket);
+//   }
+// }

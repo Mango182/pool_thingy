@@ -1,12 +1,13 @@
 //for some reason in order to get this to work you have to downoad the following extension: Live Server
 
+
 //to do list:
 //missing whether or not the ball is potted
 //analysis of the situation: we aint done
 
 //creates some crazy global variables
 var ballList = createBalls();
-var pocketList = createPockets();
+var pocketList;
 var solids = [];
 var stripes = [];
 var turn = 'one';
@@ -14,6 +15,7 @@ var turn = 'one';
 //var player = {turn: 'one', type: none};
 //depending on the type of the first potted one , that is what you are
 var velocity;
+var theta = 0;
 
 //takes you to the game screen and sets the position of each ball
 onEvent("playButton", "click", function(){
@@ -26,6 +28,9 @@ onEvent("playButton", "click", function(){
     var pocket = pocketList[pocket];
     setPosition(pocket.name, pocket.x - 15, pocket.y - 15);
   }
+  //sets the cue's default position
+  var cueBall = {x:ballList['ball0'].x, y:ballList['ball0'].y}
+  cue_position(cueBall.x, cueBall.y, (Math.PI/2));
 });
 
 //shows you the rules
@@ -38,24 +43,15 @@ onEvent("goBackButton","click", function(){
   setScreen("home");
 });
 
-// // when the mouse is moved rotate around the cueBall
-// onEvent("gameScreen","mousemove",function(event){
-//   var x = mouse_position(event)[0];
-//   var y = mouse_position(event)[1];
-//   theta = angle(x,y);
-//   cue_position(x, y, theta);
-// });
-
-
-//this is a test
-//so far it looks like this test is successful to making the cuestick stay
+//next I have to add a cue on the side that would charge and release the stick(launch the cueball)
+//this solution is absolutely ingenious thanks stackoverflow:D
 var pressing = false;
 
 onEvent('gameScreen', 'mousedown', function(){
   pressing = true;
-})
+});
 
-onEvent('gameScreen', 'mousemove', function(){
+onEvent('gameScreen', 'mousemove', function(event){
   if (pressing){
     var x = mouse_position(event)[0];
     var y = mouse_position(event)[1];
@@ -70,13 +66,9 @@ onEvent('gameScreen', 'mouseup', function(){
 
 //when the ball is fired, resolve collisions. once collisions are resolved, end loop, switch turns, and stop loop.
 var shot = false;
-var theta = 0;
 
 onEvent("test", 'click', function(event){
-  var x = mouse_position(event)[0];
-  var y = mouse_position(event)[1];
-  theta = angle(x,y);
-  cue(theta);
+  cue(theta); //look into there being a way where the ball can be fired without clicking this
   setTimeout(function(){
     shot = true;
   },50);
@@ -95,7 +87,7 @@ onEvent("test", 'click', function(event){
     }
     if (Math.abs(velocity) <= 0.01 && shot){
       stopTimedLoop();
-      setTimeout(function(){}, 200)
+      setTimeout(function(){}, 200);
       switchTurn();
       shot = false;
     }
@@ -137,24 +129,14 @@ for (var ball in ballList){
   }
 }
 
-//in all honesty this was just to see if i understood what i did with the creation of the balls
-function createPockets(){
-    var listOfPockets = {};
-  for (var i = 1; i < 7; i++){
-    listOfPockets['pocket'+ i] = {x:0, y:0 , name: "pocket" + i};
-  }
-  i = 1;
-  for (var j = 0; j < 2; j++){
-      for (var k = 0; k < 3; k++){
-      if (i%2 == 1){
-        listOfPockets['pocket' + i] = {x:10, y:10+(215*k), name: "pocket" + i};
-      }else{
-        listOfPockets['pocket' + i] = {x:310, y:10+(215*k) , name: "pocket" + i};
-      }
-      i++;
-    }
-  }
-  return listOfPockets;
+//this is the quicker(and easier way of doing what I did above)
+pocketList = {
+  pocket1: {x:10, y: 10, name:'pocket1'},
+  pocket2: {x:310, y: 10, name:'pocket2'},
+  pocket3: {x:10, y: 225, name:'pocket3'},
+  pocket4: {x:310, y: 225, name:'pocket4'},
+  pocket5: {x:10, y: 440, name:'pocket5'},
+  pocket6: {x:310, y: 440, name:'pocket6'}
 }
 
 //function that updates the screen(is looped over until all collisions are resolved and all balls have stopped)
@@ -251,6 +233,10 @@ function switchTurn(){
     turn = 'one';
     setProperty ('ball0', 'image', ("./assets/cueBall.jpg"));
   }
+  //the part below makes the cue always spawn next to the ball(specifically right underneath)
+  theta = (Math.PI/2);
+  var cueBall = {x:ballList['ball0'].x, y:ballList['ball0'].y}
+  cue_position(cueBall.x, cueBall.y, theta);
   showElement("test");
 }
 
@@ -298,7 +284,7 @@ function potted(ball, pocket){
   if (isTouching(ball, pocket)){
     hideElement(ball.name);
     if (ball.type == 'solid'){
-      removeItem(solids, )//how can it determain what index it is
+      removeItem(solids, solids.indexOf(ball.name, 0));//how can it determain what index it is
     }else if (ball.type == 'stripe'){
       removeItem(stripes, )
     }else(
@@ -309,7 +295,6 @@ function potted(ball, pocket){
 }
 
 // psuedocode idea thingys:
-
 /*if a certain condition is met{
   setScreen(results);
 }
@@ -348,7 +333,7 @@ yowaimo <3 - juli
 // for (var pocket in pocketList){
 //   for (var ball in ballList){
 //     pocket = pocketList[pocket];
-//     basll = ballList[ball];
+//     ball = ballList[ball];
 //     potted(ball, pocket);
 //   }
 // }

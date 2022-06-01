@@ -1,28 +1,33 @@
 //for some reason in order to get this to work you have to downoad the following extension: Live Server
 
-
-//to do list:
-//missing whether or not the ball is potted
-//analysis of the situation: we aint done
+// anyone who reads this should know that each pocket and ball has a name so i can refer to their element counterpart
 
 //creates some crazy global variables
 var ballList = createBalls();
-var pocketList;
+var pocketList = {
+  pocket1: {x:10, y: 10, name:'pocket1'},
+  pocket2: {x:310, y: 10, name:'pocket2'},
+  pocket3: {x:10, y: 225, name:'pocket3'},
+  pocket4: {x:310, y: 225, name:'pocket4'},
+  pocket5: {x:10, y: 440, name:'pocket5'},
+  pocket6: {x:310, y: 440, name:'pocket6'}
+}
 var solids = [];
 var stripes = [];
-var turn = 'one';
-//maybe change turn to a dictionary to assign it stripes and solids
-//var player = {turn: 'one', type: none};
-//depending on the type of the first potted one , that is what you are
+var player = {turn: 'one', type: 'none'};
 var velocity;
 var theta = 0;
 
 //takes you to the game screen and sets the position of each ball
 onEvent("playButton", "click", function(){
   setScreen("gameScreen");
+  ballList['ball0'].x = 165
+  ballList['ball0'].y = 380
+  // turn = 'two'
   for (var ball in ballList){
     var ball = ballList[ball];
     setPosition(ball.name, ball.x - 10, ball.y - 10);
+    showElement(ball.name);
   }
   for (var pocket in pocketList){
     var pocket = pocketList[pocket];
@@ -41,6 +46,12 @@ onEvent("instructionsButton","click", function(){
 //takes you back to the home screen
 onEvent("goBackButton","click", function(){
   setScreen("home");
+});
+
+//takes you back to home from the results screen
+//new bug from adding this, find a way to make sure that the turn stays with who the person is????
+onEvent('backButton', 'click', function(){
+  setScreen('home');
 });
 
 //next I have to add a cue on the side that would charge and release the stick(launch the cueball)
@@ -106,8 +117,6 @@ function createBalls(){
       listOfBalls['ball' + i].type = 'stripe';
     }
   }
-  listOfBalls['ball0'].x = 165;
-  listOfBalls['ball0'].y = 380;
   var i=1;
     for (var j = 0; j < 5; j++){
       for (var k = 0; k < 5 - j; k++){
@@ -120,6 +129,7 @@ function createBalls(){
 }
 
 //seperates the type of balls into solids and stripes
+//why did i do it ouside of creating the balls idk
 for (var ball in ballList){
   var ball = ballList[ball];
   if (ball.type == 'solid'){
@@ -129,21 +139,15 @@ for (var ball in ballList){
   }
 }
 
-//this is the quicker(and easier way of doing what I did above)
-pocketList = {
-  pocket1: {x:10, y: 10, name:'pocket1'},
-  pocket2: {x:310, y: 10, name:'pocket2'},
-  pocket3: {x:10, y: 225, name:'pocket3'},
-  pocket4: {x:310, y: 225, name:'pocket4'},
-  pocket5: {x:10, y: 440, name:'pocket5'},
-  pocket6: {x:310, y: 440, name:'pocket6'}
-}
-
 //function that updates the screen(is looped over until all collisions are resolved and all balls have stopped)
 function updateScreen(){
   for (var i = 0; i < 16; i++){
     var b1 = ballList['ball' + i];
     setPosition(b1.name, b1.x - 10, b1.y - 10);
+    for (var pocket in pocketList){
+      p = pocketList[pocket];
+      potted(b1,p);
+      }
     drag(b1);
     for (var j = i + 1; j < 16; j++){
       var b2 = ballList['ball'+ j];
@@ -226,11 +230,11 @@ function outside(ball){
 //switches turns between players and brings the test back onto the screen
 //thanks doug for having your code show me how to use images in the assets folder
 function switchTurn(){
-  if(turn == 'one'){
-    turn = 'two';
+  if(player.turn == 'one'){
+    player.turn = 'two';
     setProperty('ball0', 'image', ("./assets/cueBall2.jpg"));
   }else{
-    turn = 'one';
+    player.turn = 'one';
     setProperty ('ball0', 'image', ("./assets/cueBall.jpg"));
   }
   //the part below makes the cue always spawn next to the ball(specifically right underneath)
@@ -246,12 +250,6 @@ function mouse_position(event){
   return [coor.x, coor.y];
 }
 
-// fatima adds the actual gameplay(cue rotation)
-function cueRotation(angle) {
-  var rotateCueString = 'transform: rotate(' + (-angle) + 'rad)';
-  setStyle('test', rotateCueString);
-}
-
 //calculates the angle based on where the mouse is on the screen
 function angle(x, y){
   var cueBall = {x: ballList['ball0'].x - 15, y:ballList['ball0'].y - 15};
@@ -259,6 +257,11 @@ function angle(x, y){
   dy = (y - cueBall.y - 15);
   var angle = Math.atan2(dy, dx);
   return(angle);
+}
+// fatima adds the actual gameplay(cue rotation)
+function cueRotation(angle) {
+  var rotateCueString = 'transform: rotate(' + (-angle) + 'rad)';
+  setStyle('test', rotateCueString);
 }
 
 //the position of the cue will rotate around the cueBall
@@ -284,9 +287,11 @@ function potted(ball, pocket){
   if (isTouching(ball, pocket)){
     hideElement(ball.name);
     if (ball.type == 'solid'){
-      removeItem(solids, solids.indexOf(ball.name, 0));//how can it determain what index it is
+      removeItem(solids, solids.indexOf(ball.name));//how can it determain what index it is
+      console.log ('solid');
     }else if (ball.type == 'stripe'){
-      removeItem(stripes, )
+      removeItem(stripes, stripes.indexOf(ball.name))
+      console.log('stripes');
     }else(
       setScreen('results')//automatically to the results screen b/c 8ball was potted()find a way to make this the last ball in a list
     )
@@ -313,11 +318,6 @@ if (all solids && 8ball has been potted){
 }
 */
 
-//when mouse is clicked on screen:
-//lock the cue in place(by locking the angle)
-//then you can drag the pool stick on the side
-
-
 
 /*
 this is where people's comments live for the time being(for organization purposes this has been moved all the way to the bottom)
@@ -327,13 +327,3 @@ ur mom - Miguel
 make ms.mares watch anime pls - juli >:3
 yowaimo <3 - juli
 */
-
-
-
-// for (var pocket in pocketList){
-//   for (var ball in ballList){
-//     pocket = pocketList[pocket];
-//     ball = ballList[ball];
-//     potted(ball, pocket);
-//   }
-// }

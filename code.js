@@ -1,7 +1,6 @@
 //for some reason in order to get this to work you have to downoad the following extension: Live Server
 
 // anyone who reads this should know that each pocket and ball has a name so i can refer to their element counterpart
-
 //creates some crazy global variables
 var ballList = createBalls();
 var pocketList = {
@@ -23,7 +22,6 @@ onEvent("playButton", "click", function(){
   setScreen("gameScreen");
   ballList['ball0'].x = 165
   ballList['ball0'].y = 380
-  // turn = 'two'
   for (var ball in ballList){
     var ball = ballList[ball];
     setPosition(ball.name, ball.x - 10, ball.y - 10);
@@ -49,12 +47,10 @@ onEvent("goBackButton","click", function(){
 });
 
 //takes you back to home from the results screen
-//new bug from adding this, find a way to make sure that the turn stays with who the person is????
 onEvent('backButton', 'click', function(){
   setScreen('home');
 });
 
-//next I have to add a cue on the side that would charge and release the stick(launch the cueball)
 //this solution is absolutely ingenious thanks stackoverflow:D
 var pressing = false;
 
@@ -237,6 +233,7 @@ function switchTurn(){
     player.turn = 'one';
     setProperty ('ball0', 'image', ("./assets/cueBall.jpg"));
   }
+  
   //the part below makes the cue always spawn next to the ball(specifically right underneath)
   theta = (Math.PI/2);
   var cueBall = {x:ballList['ball0'].x, y:ballList['ball0'].y}

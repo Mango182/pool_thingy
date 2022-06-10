@@ -20,8 +20,9 @@ var theta = 0;
 //takes you to the game screen and sets the position of each ball
 onEvent("playButton", "click", function(){
   setScreen("gameScreen");
-  ballList['ball0'].x = 165
-  ballList['ball0'].y = 380
+  ballList['ball0'].x = 165;
+  ballList['ball0'].y = 380;
+  ballPosition(ballList);
   for (var ball in ballList){
     var ball = ballList[ball];
     setPosition(ball.name, ball.x - 10, ball.y - 10);
@@ -31,7 +32,6 @@ onEvent("playButton", "click", function(){
     var pocket = pocketList[pocket];
     setPosition(pocket.name, pocket.x - 15, pocket.y - 15);
   }
-  //sets the cue's default position
   var cueBall = {x:ballList['ball0'].x, y:ballList['ball0'].y}
   cue_position(cueBall.x, cueBall.y, (Math.PI/2));
 });
@@ -75,7 +75,7 @@ onEvent('gameScreen', 'mouseup', function(){
 var shot = false;
 
 onEvent("test", 'click', function(event){
-  cue(theta); //look into there being a way where the ball can be fired without clicking this
+  cue(theta);
   setTimeout(function(){
     shot = true;
   },50);
@@ -113,15 +113,19 @@ function createBalls(){
       listOfBalls['ball' + i].type = 'stripe';
     }
   }
-  var i=1;
-    for (var j = 0; j < 5; j++){
-      for (var k = 0; k < 5 - j; k++){
-        listOfBalls['ball'+i].x = 120 + (10*j) + (20*k);
-        listOfBalls['ball'+i].y = 100 + (20*j);
-        i++;
-      }
-    }
+  ballPosition(listOfBalls);
   return listOfBalls;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+function ballPosition(list){
+  var i = 1
+  for (var j = 0; j < 5; j++){
+    for (var k = 0; k < 5 - j; k++){
+      list['ball'+i].x = 120 + (10*j) + (20*k);
+      list['ball'+i].y = 100 + (20*j);
+      i++;
+    }
+  }
 }
 
 //seperates the type of balls into solids and stripes
@@ -233,8 +237,6 @@ function switchTurn(){
     player.turn = 'one';
     setProperty ('ball0', 'image', ("./assets/cueBall.jpg"));
   }
-  
-  //the part below makes the cue always spawn next to the ball(specifically right underneath)
   theta = (Math.PI/2);
   var cueBall = {x:ballList['ball0'].x, y:ballList['ball0'].y}
   cue_position(cueBall.x, cueBall.y, theta);
@@ -255,6 +257,7 @@ function angle(x, y){
   var angle = Math.atan2(dy, dx);
   return(angle);
 }
+
 // fatima adds the actual gameplay(cue rotation)
 function cueRotation(angle) {
   var rotateCueString = 'transform: rotate(' + (-angle) + 'rad)';
@@ -289,9 +292,9 @@ function potted(ball, pocket){
     }else if (ball.type == 'stripe'){
       removeItem(stripes, stripes.indexOf(ball.name))
       console.log('stripes');
-    }else(
+    }else{
       setScreen('results')//automatically to the results screen b/c 8ball was potted()find a way to make this the last ball in a list
-    )
+    }
     console.log(ball.name + ' has been potted');
   }
 }

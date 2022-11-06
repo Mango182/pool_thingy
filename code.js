@@ -299,6 +299,12 @@ function potted(ball, pocket){
   }
 }
 
+function isPotted(ball, pocket){
+  if (isTouching(ball, pocket)){
+    ball.name.remove();
+  }
+}
+
 // psuedocode idea thingys:
 /*if a certain condition is met{
   setScreen(results);

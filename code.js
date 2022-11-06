@@ -1,5 +1,5 @@
 //for some reason in order to get this to work you have to downoad the following extension: Live Server
-
+//does this still update git?
 // anyone who reads this should know that each pocket and ball has a name so i can refer to their element counterpart
 //creates some crazy global variables
 var ballList = createBalls();

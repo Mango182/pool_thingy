@@ -2,6 +2,10 @@
 //does this still update git?
 // anyone who reads this should know that each pocket and ball has a name so i can refer to their element counterpart
 //creates some crazy global variables
+
+//current problem: after a ball is potted, cue disapears
+//the timed loop is not continuing because it is reading 'removed'
+//from the removal of an item from the list
 var ballList = createBalls();
 var pocketList = {
   pocket1: {x:10, y: 10, name:'pocket1'},
@@ -17,11 +21,13 @@ var player = {turn: 'one', type: 'none'};
 var velocity;
 var theta = 0;
 
+const test_position = [190, 240];
+
 //takes you to the game screen and sets the position of each ball
 onEvent("playButton", "click", function(){
   setScreen("gameScreen");
-  ballList['ball0'].x = 165;
-  ballList['ball0'].y = 380;
+  ballList['ball0'].x = test_position[0];//165;
+  ballList['ball0'].y = test_position[1]//380;
   ballPosition(ballList);
   for (var ball in ballList){
     var ball = ballList[ball];
@@ -74,7 +80,7 @@ onEvent('gameScreen', 'mouseup', function(){
 //when the ball is fired, resolve collisions. once collisions are resolved, end loop, switch turns, and stop loop.
 var shot = false;
 
-onEvent("test", 'click', function(event){
+onEvent("cue", 'click', function(event){
   cue(theta);
   setTimeout(function(){
     shot = true;
@@ -82,7 +88,7 @@ onEvent("test", 'click', function(event){
   var idk = timedLoop(16, function(){
     if (velocity != 0){
       if(shot){
-        hideElement("test");
+        hideElement("cue");
       }
       updateScreen();
       var velocity = 0;
@@ -90,6 +96,7 @@ onEvent("test", 'click', function(event){
         var b = ballList[ball];
         outside(b);
         velocity += (b.x_v + b.y_v);
+        console.log(velocity);
       }
     }
     if (Math.abs(velocity) <= 0.01 && shot){
@@ -105,7 +112,7 @@ onEvent("test", 'click', function(event){
 function createBalls(){
   var listOfBalls = {};
   for (var i = 0; i < 16; i++) {
-    listOfBalls['ball' + i] = {x:0, y:0, x_v:0, y_v:0, name: "ball"+i, type: '8 ball'};
+    listOfBalls['ball' + i] = {x:0, y:0, x_v:0, y_v:0, name: "ball"+i, type: 'eight_ball'};
     if (i < 8 && i != 0){
       listOfBalls['ball' + i].type = 'solid';
     }
@@ -146,7 +153,7 @@ function updateScreen(){
     setPosition(b1.name, b1.x - 10, b1.y - 10);
     for (var pocket in pocketList){
       p = pocketList[pocket];
-      potted(b1,p);
+      isPotted(b1,p);
       }
     drag(b1);
     for (var j = i + 1; j < 16; j++){
@@ -240,7 +247,7 @@ function switchTurn(){
   theta = (Math.PI/2);
   var cueBall = {x:ballList['ball0'].x, y:ballList['ball0'].y}
   cue_position(cueBall.x, cueBall.y, theta);
-  showElement("test");
+  showElement("cue");
 }
 
 //gets the position of the mouse when an 'event' is triggered
@@ -261,7 +268,7 @@ function angle(x, y){
 // fatima adds the actual gameplay(cue rotation)
 function cueRotation(angle) {
   var rotateCueString = 'transform: rotate(' + (-angle) + 'rad)';
-  setStyle('test', rotateCueString);
+  setStyle('cue', rotateCueString);
 }
 
 //the position of the cue will rotate around the cueBall
@@ -271,7 +278,7 @@ function cue_position(x, y, angle){
   var sin = Math.sin(angle);
   var nx = -(70* cos) + cueBall.x;
   var ny = cueBall.y + (70 * sin);
-  setPosition('test', nx, ny);
+  setPosition('cue', nx, ny);
   cueRotation(angle);
 }
 
@@ -301,10 +308,22 @@ function potted(ball, pocket){
 
 function isPotted(ball, pocket){
   if (isTouching(ball, pocket)){
-    ball.name.remove();
+    if(ball.type == 'solid'){
+      document.getElementById(ball.name).remove();
+      removeItem(solids, solids.indexOf(ball.name));
+      removeItem(ballList, ballList.indexOf(ball.name));
+      console.log('solid');
+    }else if (ball.type == 'stripe'){
+      document.getElementById(ball.name).remove();
+      removeItem(stripes, stripes.indexOf(ball.name));
+      removeItem(ballList, ballList.indexOf(ball.name));
+      console.log('stripes');
+    }else if (ball.type == 'eight_ball'){
+      setScreen('results');
+    }
+  console.log(ball.name + ' has been potted');
   }
 }
-
 // psuedocode idea thingys:
 /*if a certain condition is met{
   setScreen(results);
